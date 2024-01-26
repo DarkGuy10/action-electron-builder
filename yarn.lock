@@ -118,6 +118,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"action-electron-builder@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "action-electron-builder@workspace:."
+  dependencies:
+    "@actions/core": "npm:^1.10.1"
+    "@actions/exec": "npm:^1.1.1"
+    "@types/node": "npm:^20.11.5"
+    "@vercel/ncc": "npm:^0.38.1"
+    prettier: "npm:^3.2.4"
+    typescript: "npm:^5.3.3"
+  languageName: unknown
+  linkType: soft
+
 "agent-base@npm:^7.0.2, agent-base@npm:^7.1.0":
   version: 7.1.0
   resolution: "agent-base@npm:7.1.0"
@@ -341,19 +354,6 @@ __metadata:
   checksum: 63e80da2ff9b621e2cb1596abcb9207f1cf82b968b116ccd7b959e3323144cce7fb141462200971c38bbf2ecca51695069db45265705bed09a7cd93ae5b89f94
   languageName: node
   linkType: hard
-
-"gh-action-electron-builder@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "gh-action-electron-builder@workspace:."
-  dependencies:
-    "@actions/core": "npm:^1.10.1"
-    "@actions/exec": "npm:^1.1.1"
-    "@types/node": "npm:^20.11.5"
-    "@vercel/ncc": "npm:^0.38.1"
-    prettier: "npm:^3.2.4"
-    typescript: "npm:^5.3.3"
-  languageName: unknown
-  linkType: soft
 
 "glob@npm:^10.2.2, glob@npm:^10.3.10":
   version: 10.3.10
