@@ -1,5 +1,5 @@
 name: Electron Builder Action
-author: Samuel Meuli
+author: DarkGuy10
 description: GitHub Action for building and releasing Electron apps
 
 inputs:
@@ -53,8 +53,8 @@ inputs:
     required: false
 
 runs:
-  using: node12
-  main: index.js
+  using: node20
+  main: dist/index.js
 
 branding:
   icon: upload-cloud
