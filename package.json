@@ -1,6 +1,6 @@
 {
-	"name": "gh-action-electron-builder",
-	"version": "1.6.0",
+	"name": "action-electron-builder",
+	"version": "1.0.0",
 	"description": "GitHub Action for building and releasing Electron apps",
 	"author": {
 		"name": "DarkGuy10",
@@ -17,9 +17,9 @@
 			"url": "https://github.com/DarkGuy10"
 		}
 	],
-	"repository": "github:DarkGuy10/gh-action-electron-builder",
+	"repository": "github:DarkGuy10/action-electron-builder",
 	"bugs": {
-		"url": "https://github.com/DarkGuy10/gh-action-electron-builder/issues"
+		"url": "https://github.com/DarkGuy10/action-electron-builder/issues"
 	},
 	"license": "MIT",
 	"private": true,
