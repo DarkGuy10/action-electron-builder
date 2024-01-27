@@ -1,4 +1,4 @@
-name: Electron Builder Action
+name: Electron Builder Github Action
 author: DarkGuy10
 description: GitHub Action for building and releasing Electron apps
 
@@ -46,6 +46,10 @@ inputs:
     description: Maximum number of attempts for completing the build and release step
     required: false
     default: '1'
+  package_manager:
+    description: Package manager to be used for this project (accepted values - npm, yarn, pnpm) (defaults to npm)
+    required: false
+    default: 'npm'
 
 runs:
   using: node20
