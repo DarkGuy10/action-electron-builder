@@ -29,15 +29,15 @@ GitHub Actions allows you to build your app on macOS, Windows and Linux without 
 
        steps:
          - name: Check out Git repository
-           uses: actions/checkout@v1
+           uses: actions/checkout@v4
 
          - name: Install Node.js, NPM and Yarn
-           uses: actions/setup-node@v1
+           uses: actions/setup-node@v4
            with:
-             node-version: 10
+             node-version: 20
 
          - name: Build/release Electron app
-           uses: samuelmeuli/action-electron-builder@v1
+           uses: DarkGuy10/action-electron-builder@v1
            with:
              # GitHub token, automatically provided to the action
              # (No need to define this secret in the repo settings)
@@ -71,6 +71,7 @@ After building successfully, the action will publish your release artifacts. By 
 
 You can configure the action further with the following options:
 
+- `package_manager`: The package manager that should be used (accepted: `"npm"`, `"yarn"`, `"pnpm"`) (default: `"npm"`)
 - `package_root`: Directory where NPM/Yarn commands should be run (default: `"."`)
 - `build_script_name`: Name of the optional NPM build script which is executed before `electron-builder` (default: `"build"`)
 - `skip_build`: Whether the action should execute the NPM build script before running `electron-builder`
@@ -94,7 +95,7 @@ Add the following options to your workflow's existing `action-electron-builder` 
 
 ```yml
 - name: Build/release Electron app
-  uses: samuelmeuli/action-electron-builder@v1
+  uses: DarkGuy10/action-electron-builder@v1
   with:
     # ...
     mac_certs: ${{ secrets.mac_certs }}
@@ -144,7 +145,7 @@ If you've configured `electron-builder` to notarize your Electron Mac app [as de
 
     ```yml
     - name: Build/release Electron app
-      uses: samuelmeuli/action-electron-builder@v1
+      uses: DarkGuy10/action-electron-builder@v1
       with:
         # ...
       env:
