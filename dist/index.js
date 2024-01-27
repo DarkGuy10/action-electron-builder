@@ -25933,6 +25933,46 @@ exports["default"] = _default;
 
 /***/ }),
 
+/***/ 5973:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.exportVariableIfPresent = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+function exportVariableIfPresent(name, val) {
+    if (val)
+        core.exportVariable(name, val);
+}
+exports.exportVariableIfPresent = exportVariableIfPresent;
+
+
+/***/ }),
+
 /***/ 5025:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -25990,6 +26030,8 @@ const exec_1 = __nccwpck_require__(1514);
 const getPlatform_1 = __nccwpck_require__(5025);
 const path_1 = __nccwpck_require__(1017);
 const fs_1 = __nccwpck_require__(7147);
+const exportVariableIfPresent_1 = __nccwpck_require__(5973);
+const pmCommands_1 = __nccwpck_require__(3119);
 /**
  * The main function for this action
  */
@@ -26006,46 +26048,37 @@ async function run() {
         const args = core.getInput('args') || '';
         const maxAttempts = parseInt(core.getInput('max_attempts') || '1', 10);
         const githubToken = core.getInput('github_token', { required: true });
+        const _pm = core.getInput('package_manager');
         const pkgJsonPath = (0, path_1.join)(pkgRoot, 'package.json');
-        const pkgLockPath = (0, path_1.join)(pkgRoot, 'package-lock.json');
-        // Determine whether NPM should be used to run commands (instead of Yarn, which is the default)
-        const useNpm = (0, fs_1.existsSync)(pkgLockPath);
-        console.log(`Will run ${useNpm ? 'NPM' : 'Yarn'} commands in directory ${pkgRoot}`);
-        // Make sure `package.json` file exists
+        // Make sure the package manager is supported
+        if (!['npm', 'yarn', 'pnpm'].includes(_pm))
+            throw new Error(`Unsupported \`package_manager\` provided: ${_pm}. Allowed values: npm, yarn, pnpm`);
+        const pm = _pm;
         if (!(0, fs_1.existsSync)(pkgJsonPath))
+            // Make sure `package.json` file exists
             throw new Error(`\`package.json\` file not found at path "${pkgJsonPath}"`);
         // Copy "github_token" input variable to "GH_TOKEN" env variable (required by `electron-builder`)
         core.exportVariable('GH_TOKEN', githubToken);
         // Require code signing certificate and password if building for macOS. Export them to environment
         // variables (required by `electron-builder`)
         if (platform === 'mac') {
-            core.exportVariable('CSC_LINK', core.getInput('mac_certs'));
-            core.exportVariable('CSC_KEY_PASSWORD', core.getInput('mac_certs_password'));
+            (0, exportVariableIfPresent_1.exportVariableIfPresent)('CSC_LINK', core.getInput('mac_certs'));
+            (0, exportVariableIfPresent_1.exportVariableIfPresent)('CSC_KEY_PASSWORD', core.getInput('mac_certs_password'));
         }
         else if (platform === 'windows') {
-            core.exportVariable('CSC_LINK', core.getInput('windows_certs'));
-            core.exportVariable('CSC_KEY_PASSWORD', core.getInput('windows_certs_password'));
+            (0, exportVariableIfPresent_1.exportVariableIfPresent)('CSC_LINK', core.getInput('windows_certs'));
+            (0, exportVariableIfPresent_1.exportVariableIfPresent)('CSC_KEY_PASSWORD', core.getInput('windows_certs_password'));
         }
         // Disable console advertisements during install phase
         core.exportVariable('ADBLOCK', true);
-        console.log(`Installing dependencies using ${useNpm ? 'NPM' : 'Yarn'}`);
-        await (0, exec_1.exec)(useNpm ? 'npm install' : 'yarn', [], { cwd: pkgRoot });
+        console.log(`Installing dependencies using ${pm}`);
+        await (0, exec_1.exec)(pmCommands_1.pmCommands[pm].install, [], { cwd: pkgRoot });
         // Run NPM build script if it exists
         if (skipBuild)
             console.log('Skipping build script because `skip_build` option is set');
         else {
             console.log('Running the build script');
-            if (useNpm)
-                await (0, exec_1.exec)(`npm run ${buildScriptName} --if-present`, [], {
-                    cwd: pkgRoot,
-                });
-            else {
-                // TODO: Use `yarn run ${buildScriptName} --if-present` once supported (I have lost hope for this)
-                // https://github.com/yarnpkg/yarn/issues/6894
-                const pkgJson = JSON.parse((0, fs_1.readFileSync)(pkgJsonPath, 'utf8'));
-                if (pkgJson.scripts && pkgJson.scripts[buildScriptName])
-                    await (0, exec_1.exec)(`yarn ${buildScriptName}`, [], { cwd: pkgRoot });
-            }
+            await (0, exec_1.exec)(pmCommands_1.pmCommands[pm].build(buildScriptName), [], { cwd: pkgRoot });
         }
         console.log(`Building${release ? ' and releasing' : ''} the Electron app`);
         const cmd = useVueCli
@@ -26053,7 +26086,7 @@ async function run() {
             : 'electron-builder';
         for (let i = 1; i < maxAttempts; i++) {
             try {
-                await (0, exec_1.exec)(`${useNpm ? 'npx --no-install' : 'yarn run'} ${cmd} --${platform} ${release ? '--publish always' : ''} ${args}`, [], { cwd: pkgRoot });
+                await (0, exec_1.exec)(`${pmCommands_1.pmCommands[pm].prefix} ${cmd} --${platform} ${release ? '--publish always' : ''} ${args}`, [], { cwd: pkgRoot });
                 break;
             }
             catch (err) {
@@ -26071,6 +26104,34 @@ async function run() {
     }
 }
 exports.run = run;
+
+
+/***/ }),
+
+/***/ 3119:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.pmCommands = void 0;
+exports.pmCommands = {
+    npm: {
+        install: 'npm install',
+        build: (buildScriptName) => `npm run ${buildScriptName} --if-present`,
+        prefix: 'npx --no-install',
+    },
+    yarn: {
+        install: 'yarn',
+        build: (buildScriptName) => `yarn ${buildScriptName}`,
+        prefix: 'yarn run',
+    },
+    pnpm: {
+        install: 'pnpm install',
+        build: (buildScriptName) => `pnpm run ${buildScriptName} --if-present`,
+        prefix: 'pnpm exec',
+    },
+};
 
 
 /***/ }),
