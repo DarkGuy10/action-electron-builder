@@ -75,7 +75,7 @@ export async function run() {
 		const cmd = useVueCli
 			? 'vue-cli-service electron:build'
 			: 'electron-builder'
-		for (let i = 1; i < maxAttempts; i++) {
+		for (let i = 0; i < maxAttempts; i++) {
 			try {
 				await exec(
 					`${pmCommands[pm].prefix} ${cmd} --${platform} ${
