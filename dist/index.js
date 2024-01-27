@@ -26084,7 +26084,7 @@ async function run() {
         const cmd = useVueCli
             ? 'vue-cli-service electron:build'
             : 'electron-builder';
-        for (let i = 1; i < maxAttempts; i++) {
+        for (let i = 0; i < maxAttempts; i++) {
             try {
                 await (0, exec_1.exec)(`${pmCommands_1.pmCommands[pm].prefix} ${cmd} --${platform} ${release ? '--publish always' : ''} ${args}`, [], { cwd: pkgRoot });
                 break;
